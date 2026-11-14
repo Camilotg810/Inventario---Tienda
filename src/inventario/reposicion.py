@@ -6,6 +6,15 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Producto:
+    """Producto del inventario con su stock actual y su umbral de reposición.
+
+    Atributos:
+        codigo: identificador único del producto, por ejemplo "A1".
+        nombre: nombre legible, por ejemplo "Arroz 500 g".
+        stock: unidades disponibles (entero >= 0).
+        stock_minimo: umbral de reposición (entero >= 0).
+    """
+
     codigo: str
     nombre: str
     stock: int
@@ -18,6 +27,7 @@ class Producto:
 
     @property
     def requiere_pedido(self) -> bool:
+        """True si el stock llegó al mínimo o quedó por debajo (stock <= mínimo)."""
         return self.stock <= self.stock_minimo
 
 
@@ -58,6 +68,24 @@ def _orden_de_urgencia(producto: Producto) -> tuple[int, str]:
 
 
 def productos_por_pedir(productos: list[Producto]) -> list[Producto]:
+    """Devuelve los productos que hay que pedir al proveedor, del más urgente al menos.
+
+    Un producto se pide cuando `stock <= stock_minimo`. El orden es: mayor
+    faltante primero (`stock_minimo - stock`) y, a igual faltante, por nombre
+    alfabético sin distinguir mayúsculas ni tildes.
+
+    Recibe:
+        productos: lista de `Producto`; puede estar vacía. No se modifica.
+
+    Devuelve:
+        Una lista nueva con los productos por pedir; vacía si ninguno lo requiere.
+
+    Lanza:
+        TypeError: si `stock` o `stock_minimo` de algún producto no es un entero.
+        ValueError: si `stock` o `stock_minimo` de algún producto es negativo.
+        Ambos mensajes incluyen el código del producto. Se validan todos los
+        productos antes de filtrar, así que un dato inválido nunca se ignora.
+    """
     for producto in productos:
         _validar(producto)
 
