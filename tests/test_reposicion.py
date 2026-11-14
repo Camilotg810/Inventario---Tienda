@@ -4,7 +4,12 @@ from inventario.reposicion import Producto, productos_por_pedir
 
 
 def producto(codigo, stock, minimo, nombre=None):
-    return Producto(codigo=codigo, nombre=nombre or f"Producto {codigo}", stock=stock, stock_minimo=minimo)
+    return Producto(
+        codigo=codigo,
+        nombre=nombre or f"Producto {codigo}",
+        stock=stock,
+        stock_minimo=minimo,
+    )
 
 
 # --- Casos normales ---
@@ -56,7 +61,10 @@ def test_producto_agotado_con_stock_cero_se_incluye():
 
 
 def test_si_todos_tienen_stock_suficiente_devuelve_lista_vacia():
-    productos = [producto("A1", stock=11, minimo=10), producto("B2", stock=100, minimo=5)]
+    productos = [
+        producto("A1", stock=11, minimo=10),
+        producto("B2", stock=100, minimo=5),
+    ]
 
     assert productos_por_pedir(productos) == []
 
