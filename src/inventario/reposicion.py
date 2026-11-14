@@ -21,17 +21,18 @@ class Producto:
         return self.stock <= self.stock_minimo
 
 
+def _exigir_no_negativo(codigo: str, descripcion: str, valor: int) -> None:
+    """Lanza ValueError si `valor` es negativo, indicando el código del producto."""
+    if valor < 0:
+        raise ValueError(
+            f"Producto {codigo}: {descripcion} no puede ser negativo ({valor})"
+        )
+
+
 def _validar(producto: Producto) -> None:
     """Lanza ValueError si el producto tiene cantidades negativas."""
-    if producto.stock < 0:
-        raise ValueError(
-            f"Producto {producto.codigo}: el stock no puede ser negativo ({producto.stock})"
-        )
-    if producto.stock_minimo < 0:
-        raise ValueError(
-            f"Producto {producto.codigo}: el stock minimo no puede ser negativo "
-            f"({producto.stock_minimo})"
-        )
+    _exigir_no_negativo(producto.codigo, "el stock", producto.stock)
+    _exigir_no_negativo(producto.codigo, "el stock mínimo", producto.stock_minimo)
 
 
 def _clave_nombre(nombre: str) -> str:
