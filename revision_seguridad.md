@@ -61,7 +61,7 @@ Archivo y línea se refieren al commit revisado (d93df8e).
 | Sospecha: `faltante` puede ser negativo y romper el orden | Falso positivo | Solo se ordenan los productos ya filtrados por `requiere_pedido`, que cumplen `stock <= stock_minimo`, así que su faltante es 0 o mayor |
 | Sospecha: no se validan códigos repetidos | Falso positivo (decisión documentada) | La unicidad es un supuesto del contrato y se valida al registrar (entrada 4 de la bitácora). Con códigos repetidos la función devuelve ambos productos, como se espera. Queda como pendiente para el registro |
 
-**Lo que la IA no encontró:** la revisión de la IA se centró en `reposicion.py` y no señaló los problemas que encontré con otras herramientas: las líneas largas (H-05, con ruff), `pytest>=8.0` sin versión fijada (H-03, con la lista de revisión), la ausencia de `.env.example` (H-04, con la lista de revisión) y el nombre sin commit y el marcador `[nombre y apellido]` en el README (H-08, con `git status` y al leer el README). Todos son de baja severidad: la IA se fijó en la lógica del código y no en el entorno del repositorio.
+**Lo que la IA no encontró:** la revisión de la IA se centró en `reposicion.py` y no señaló los problemas que encontré con otras herramientas: las líneas largas (H-05, con ruff), `pytest>=8.0` sin versión fijada (H-03, con la lista de revisión), la ausencia de `.env.example` (H-04, con la lista de revisión) y el nombre sin commit y el marcador `Juan Camilo Trujillo` en el README (H-08, con `git status` y al leer el README). Todos son de baja severidad: la IA se fijó en la lógica del código y no en el entorno del repositorio.
 
 ## 4. Pendientes
 
