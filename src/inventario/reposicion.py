@@ -1,5 +1,6 @@
 """Reposición de inventario: qué productos hay que pedir (HU-03)."""
 
+import unicodedata
 from dataclasses import dataclass
 
 
@@ -33,9 +34,15 @@ def _validar(producto: Producto) -> None:
         )
 
 
+def _clave_nombre(nombre: str) -> str:
+    """Nombre sin tildes ni distinción de mayúsculas, para ordenar alfabéticamente."""
+    descompuesto = unicodedata.normalize("NFD", nombre.casefold())
+    return "".join(c for c in descompuesto if not unicodedata.combining(c))
+
+
 def _orden_de_urgencia(producto: Producto) -> tuple[int, str]:
     """Clave de orden: mayor faltante primero y, a igual faltante, por nombre."""
-    return (-producto.faltante, producto.nombre)
+    return (-producto.faltante, _clave_nombre(producto.nombre))
 
 
 def productos_por_pedir(productos: list[Producto]) -> list[Producto]:
