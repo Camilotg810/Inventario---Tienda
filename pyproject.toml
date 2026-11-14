@@ -1,0 +1,8 @@
+[tool.ruff.lint]
+# E: estilo (pycodestyle), F: errores (pyflakes), B: errores probables (bugbear),
+# S: seguridad (bandit)
+select = ["E", "F", "B", "S"]
+
+[tool.ruff.lint.per-file-ignores]
+# pytest comprueba resultados con `assert`; S101 no aplica en las pruebas.
+"tests/**" = ["S101"]
