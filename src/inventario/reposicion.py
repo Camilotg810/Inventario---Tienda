@@ -21,8 +21,17 @@ class Producto:
         return self.stock <= self.stock_minimo
 
 
-def _exigir_no_negativo(codigo: str, descripcion: str, valor: int) -> None:
-    """Lanza ValueError si `valor` es negativo, indicando el código del producto."""
+def _exigir_entero_no_negativo(codigo: str, descripcion: str, valor: int) -> None:
+    """Valida un dato numérico del producto, indicando su código si falla.
+
+    Lanza TypeError si `valor` no es un entero (un bool tampoco vale) y
+    ValueError si es negativo.
+    """
+    if isinstance(valor, bool) or not isinstance(valor, int):
+        raise TypeError(
+            f"Producto {codigo}: {descripcion} debe ser un entero, "
+            f"se recibió {valor!r}"
+        )
     if valor < 0:
         raise ValueError(
             f"Producto {codigo}: {descripcion} no puede ser negativo ({valor})"
@@ -30,9 +39,11 @@ def _exigir_no_negativo(codigo: str, descripcion: str, valor: int) -> None:
 
 
 def _validar(producto: Producto) -> None:
-    """Lanza ValueError si el producto tiene cantidades negativas."""
-    _exigir_no_negativo(producto.codigo, "el stock", producto.stock)
-    _exigir_no_negativo(producto.codigo, "el stock mínimo", producto.stock_minimo)
+    """Lanza TypeError o ValueError si stock o stock mínimo no son válidos."""
+    _exigir_entero_no_negativo(producto.codigo, "el stock", producto.stock)
+    _exigir_entero_no_negativo(
+        producto.codigo, "el stock mínimo", producto.stock_minimo
+    )
 
 
 def _clave_nombre(nombre: str) -> str:
