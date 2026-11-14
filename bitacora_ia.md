@@ -61,17 +61,75 @@ Asistente usado: Claude (chat). El código inicial, las pruebas y el refactor fu
 - **Verificación:** Revisé el contrato; la dataclass `Producto` declara `int` y las pruebas de error cubren los negativos.
 - **Commit relacionado:** 47b8831 Implementa productos_por_pedir (pruebas en verde)
 
+### Entrada 7
+
+- **Fecha:** 2026-11-14
+- **Prompt o sugerencia:** Segunda revisión de `reposicion.py` y de los tests con tres criterios (corrección y pruebas, diseño y legibilidad, seguridad con los cinco puntos), tabla de hallazgos con línea y severidad, y separando problemas seguros de sospechas. El asistente devolvió 4 problemas seguros (orden por nombre, validación incompleta, falta de docstrings, validación duplicada) y 4 sospechas (`<=` contra `<`, `sorted` que modifica la entrada, `faltante` negativo, códigos repetidos).
+- **Decisión:** Aceptada con cambios
+- **Por qué:** Acepté los 4 problemas seguros porque cada uno se podía reproducir. Descarté las 4 sospechas como falsos positivos después de comprobarlas (ver verificación). No copié la tabla tal cual: cada fila se clasificó en `revision_seguridad.md`, sección 3.
+- **Verificación:** Ejecuté la función con entradas que reproducen cada hallazgo. El orden devolvió `Azúcar, Zeta, alfa, arroz, Árbol` y un stock `NaN` desapareció de la lista sin error: ambos reales. Las sospechas no se confirmaron: `<=` es lo que pide el contrato y lo cubre una prueba, `sorted` no modifica la entrada (`original == copia` dio `True`), `faltante` solo se calcula sobre productos con `stock <= stock_minimo`, y los códigos repetidos son un supuesto documentado en la entrada 4. Además, `ruff` y la lista de revisión encontraron cosas que la IA no señaló (líneas largas, `pytest>=8.0` sin versión fijada, falta de `.env.example`).
+- **Commit relacionado:** ninguno por sí sola; los hallazgos reales quedaron en H-01 a H-07 de `revision_seguridad.md`.
+
+### Entrada 8
+
+- **Fecha:** 2026-11-14
+- **Prompt o sugerencia:** Corregir H-01: el desempate por nombre debía ser alfabético de verdad. El asistente propuso una clave de orden `_clave_nombre` que pasa el nombre a minúsculas con `casefold()` y le quita las tildes con `unicodedata`.
+- **Decisión:** Aceptada con cambios
+- **Por qué:** Cambié la idea de usar solo `casefold()`: la tienda tiene nombres en español como `Árbol` y `Azúcar`, y sin quitar las tildes seguirían quedando al final. Dejé la `ñ` fuera a propósito (se ordena como `n`) y la anoté como pendiente, porque el orden correcto depende de la configuración regional.
+- **Verificación:** Escribí primero 2 pruebas nuevas y las vi fallar en rojo. Tras el cambio, las 12 pasan (10 anteriores + 2 nuevas). No toqué la lógica de ninguna prueba de la semana 5.
+- **Commit relacionado:** 4ab1ab3 Fix H-01
+
+### Entrada 9
+
+- **Fecha:** 2026-11-14
+- **Prompt o sugerencia:** Corregir H-02: rechazar `stock` y `stock_minimo` que no sean enteros. El asistente propuso lanzar `TypeError` con el código del producto para decimales, `NaN`, `bool`, texto y `None`.
+- **Decisión:** Aceptada
+- **Por qué:** Un stock `NaN` hacía desaparecer un producto de la lista de pedidos sin ningún aviso, y eso es peor que un error visible. Es coherente con la entrada 6: no convertir en silencio los datos mal capturados, sino rechazarlos. Usé `TypeError` y no `ValueError` porque el problema es el tipo, no el valor. Excluí `bool` porque en Python `True` es un entero.
+- **Verificación:** 6 pruebas nuevas (5 valores inválidos de `stock` y 1 de `stock_minimo`), en rojo antes del arreglo y en verde después: 18 de 18. El README y el docstring de `productos_por_pedir` ya mencionan el `TypeError`, y los mensajes incluyen el código del producto.
+- **Commit relacionado:** 4847cf9 Fix H-02
+
+### Entrada 10
+
+- **Fecha:** 2026-11-14
+- **Prompt o sugerencia:** Refactor de la validación duplicada (H-07) y borradores de los docstrings de `Producto`, `requiere_pedido` y `productos_por_pedir` (H-06).
+- **Decisión:** Aceptada
+- **Por qué:** `_validar` repetía el mismo bloque para `stock` y para `stock_minimo`; una sola función auxiliar deja la regla en un lugar. Los docstrings eran lo que pedía la tarea: qué hace, qué recibe, qué devuelve y qué errores lanza.
+- **Verificación:** Hice el refactor en un commit aparte con las 12 pruebas en verde antes y después. Comparé cada frase del docstring con el código: el orden lo fija `_orden_de_urgencia`, el no modificar la entrada lo cubre `test_no_modifica_la_lista_de_entrada`, y los dos errores con el código del producto los cubren las pruebas de error. En los tests, las 2 líneas largas se reformatearon sin cambiar la lógica: el árbol sintáctico (`ast`) del archivo es idéntico antes y después.
+- **Commit relacionado:** 4dee476 Refactor R-01, 8ac0da6 Docs y de8df82 Style
+
+### Entrada 11
+
+- **Fecha:** 2026-11-14
+- **Prompt o sugerencia:** Las correcciones, el README y el informe se hicieron con el asistente ejecutando comandos (pruebas, ruff, pip-audit, git) sobre una copia del repositorio, en la rama `revision-semana-6` y no en `main`.
+- **Decisión:** Aceptada
+- **Por qué:** La tarea pide que el trabajo delegado a un agente vaya en una rama propia, con instrucciones delimitadas y con el diff revisado antes de integrar. Los commits son pequeños (uno por hallazgo) para poder revisarlos de a uno.
+- **Verificación:** Revisé el diff con `git diff main..revision-semana-6` antes de integrarlo con `git merge revision-semana-6` (avance rápido, sin conflictos). [Escribe aquí una observación tuya sobre lo que viste en el diff.] Después de integrar, volví a ejecutar `pytest`, `ruff check .` y `pip-audit -r requirements.txt` y probé el README en una carpeta limpia.
+- **Commit relacionado:** rama `revision-semana-6` (de 4387ff1 a 601f5b8 y los commits de informe y bitácora)
+
+### Entrada 12
+
+- **Fecha:** 2026-11-14
+- **Prompt o sugerencia:** Resolver el orden de la `ñ` con `locale.strxfrm` o con la librería `babel`, para que `Ñame` quede después de `Nuez`.
+- **Decisión:** Rechazada
+- **Por qué:** Con `locale` el resultado depende de la configuración regional de cada equipo y las pruebas dejarían de ser reproducibles; `babel` sería una dependencia nueva para un desempate de bajo impacto. Lo dejé como pendiente con un plan.
+- **Verificación:** Comprobé que hoy la `ñ` se ordena como `n` (`Ñame` antes que `Nuez`) y que solo afecta el desempate entre productos con el mismo faltante. Quedó documentado en el README (supuestos) y en `revision_seguridad.md`, sección 4.
+- **Commit relacionado:** ninguno (pendiente documentado en el informe)
+
 ## Resumen
 
 | Decisión | Cantidad |
 |---|---|
-| Aceptadas | 3 |
-| Aceptadas con cambios | 1 |
-| Rechazadas | 2 |
+| Aceptadas | 6 |
+| Aceptadas con cambios | 3 |
+| Rechazadas | 3 |
 
 ## Errores que atraparon las pruebas
 
 El código generado pasó las 10 pruebas en la primera ejecución, así que las pruebas no detectaron un error real en la implementación inicial. Para saber si de todas formas protegían el comportamiento, rompí el código a propósito de cuatro formas; cada cambio lo atrapó una prueba distinta. Por ejemplo, cambiar `<=` por `<` hizo fallar `test_stock_igual_al_minimo_se_considera_por_pedir`, y quitar la validación del mínimo hizo fallar `test_stock_minimo_negativo_lanza_value_error`. Al restaurar el código volvió todo a verde.
+
+### Semana 6
+
+Las pruebas de la semana 5 no detectaron dos errores reales del código, porque no probaban esos casos: el orden por nombre con mayúsculas y tildes (H-01) y los datos que no son enteros, como `NaN` (H-02). Los encontró la revisión: escribí pruebas nuevas, las vi fallar en rojo y luego las puse en verde con el arreglo. Las 10 pruebas originales no cambiaron de lógica.
 
 ## Reflexión final (5 a 8 líneas)
 
