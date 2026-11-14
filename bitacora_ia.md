@@ -1,7 +1,7 @@
 # Bitácora de uso de IA
 
 Proyecto: Inventario Tienda
-Estudiante: [nombre y apellido]
+Estudiante: Juan Camilo Trujillo Garrido
 Funcionalidad: HU-03 Ver los productos por pedir
 Asistente usado: Claude (chat). El código inicial, las pruebas y el refactor fueron generados por el asistente a partir de mis indicaciones; yo los revisé, los ejecuté y decidí qué conservar.
 
