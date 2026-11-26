@@ -103,7 +103,7 @@ Asistente usado: Claude (chat). El código inicial, las pruebas y el refactor fu
 - **Prompt o sugerencia:** Las correcciones, el README y el informe se hicieron con el asistente ejecutando comandos (pruebas, ruff, pip-audit, git) sobre una copia del repositorio, en la rama `revision-semana-6` y no en `main`.
 - **Decisión:** Aceptada
 - **Por qué:** La tarea pide que el trabajo delegado a un agente vaya en una rama propia, con instrucciones delimitadas y con el diff revisado antes de integrar. Los commits son pequeños (uno por hallazgo) para poder revisarlos de a uno.
-- **Verificación:** Revisé el diff con `git diff main..revision-semana-6` antes de integrarlo con `git merge revision-semana-6` (avance rápido, sin conflictos). se agregaron componentes nuevo al proyecto y no se registra ninguna novedad, 18p passed, Después de integrar, volví a ejecutar `pytest`, `ruff check .` y `pip-audit -r requirements.txt` y probé el README en una carpeta limpia.
+- **Verificación:** Revisé el diff con `git diff main..revision-semana-6` antes de integrarlo con `git merge revision-semana-6` (avance rápido, sin conflictos). Vi que los tests de la semana 5 solo cambiaron en el formato de dos líneas largas y que la lógica nueva está en `reposicion.py` y en `tests/test_revision_semana6.py`. Después de integrar, volví a ejecutar `pytest`, `ruff check .` y `pip-audit -r requirements.txt` y probé el README en una carpeta limpia.
 - **Commit relacionado:** rama `revision-semana-6` (de 4387ff1 a 601f5b8 y los commits de informe y bitácora)
 
 ### Entrada 12
@@ -113,7 +113,7 @@ Asistente usado: Claude (chat). El código inicial, las pruebas y el refactor fu
 - **Decisión:** Rechazada
 - **Por qué:** Con `locale` el resultado depende de la configuración regional de cada equipo y las pruebas dejarían de ser reproducibles; `babel` sería una dependencia nueva para un desempate de bajo impacto. Lo dejé como pendiente con un plan.
 - **Verificación:** Comprobé que hoy la `ñ` se ordena como `n` (`Ñame` antes que `Nuez`) y que solo afecta el desempate entre productos con el mismo faltante. Quedó documentado en el README (supuestos) y en `revision_seguridad.md`, sección 4.
-- **Commit relacionado:** Vi que los tests de la semana 5 solo cambiaron en el formato de dos líneas largas y que la lógica nueva está en reposicion.py y en tests/test_revision_semana6.py.
+- **Commit relacionado:** ninguno (pendiente documentado en el informe)
 
 ## Resumen
 
