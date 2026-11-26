@@ -1,0 +1,41 @@
+# Pipeline de integración continua de FarmaStock.
+# En cada push y en cada pull request revisa el estilo y la seguridad con ruff,
+# corre las pruebas con pytest y audita las dependencias con pip-audit.
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  calidad-y-pruebas:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.14"]
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Instalar Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Instalar las herramientas
+        run: python -m pip install -r requirements.txt
+
+      - name: Linter (ruff, reglas E, F, B y S)
+        run: ruff check .
+
+      - name: Pruebas (pytest)
+        run: pytest
+
+      - name: Vulnerabilidades en dependencias (pip-audit)
+        run: pip-audit -r requirements.txt
