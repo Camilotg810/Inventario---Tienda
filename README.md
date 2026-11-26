@@ -8,10 +8,11 @@ Este repositorio contiene el módulo de inventario, que es la parte implementada
 
 | Funcionalidad | Origen | Código |
 |---|---|---|
+| **HU-02** Ingreso de lotes por código y fecha de vencimiento (semana 5) | Documento de requisitos de la semana 3 (necesidad N-01, prioridad Must) | `src/inventario/ingreso_lotes.py` |
 | **HU-04** Reporte de lotes que vencen en los próximos 60 días | Documento de requisitos de la semana 3 (necesidad N-01) | `src/inventario/vencimientos.py` |
 | **HU-R1** Reposición: productos por pedir | Propuesta con ayuda de IA en la semana 5; no está entre las 9 historias del documento | `src/inventario/reposicion.py` |
 
-Las otras 8 historias (HU-01, HU-02, HU-03, HU-05, HU-06, HU-07, HU-08 y HU-09) **no están implementadas**.
+Las otras 7 historias (HU-01, HU-03, HU-05, HU-06, HU-07, HU-08 y HU-09) **no están implementadas**.
 
 > Nota sobre la numeración: en la semana 5 la reposición se llamó HU-03. Aquí se llama HU-R1 porque la HU-03 del documento de requisitos es la venta fiada. La bitácora y el informe de seguridad conservan el nombre original, porque así se escribieron.
 
@@ -96,7 +97,7 @@ filas = lotes_por_vencer([Lote("Vitamina C", "L-102", 10, date(2026, 11, 10))], 
 pytest
 ```
 
-Hay 45 pruebas: 10 de la semana 5, 8 de la revisión de la semana 6 y 27 de HU-04. Otras comprobaciones de calidad y seguridad:
+Hay 70 pruebas: 25 de HU-02, 10 de la propuesta de reposición, 8 de la revisión de la semana 6 y 27 de HU-04. Otras comprobaciones de calidad y seguridad:
 
 ```bash
 ruff check .                    # linter con reglas E, F, B y S (seguridad); configurado en pyproject.toml
@@ -110,8 +111,10 @@ El informe de la revisión de código y seguridad está en [revision_seguridad.m
 ## 6. Estructura
 
 ```
+src/inventario/ingreso_lotes.py    # HU-02: ingreso de lotes (semana 5)
 src/inventario/vencimientos.py     # HU-04: lotes por vencer
 src/inventario/reposicion.py       # HU-R1: productos por pedir
+tests/test_ingreso_lotes.py        # pruebas de HU-02
 tests/test_vencimientos.py         # pruebas de HU-04
 tests/test_reposicion.py           # pruebas de la semana 5
 tests/test_revision_semana6.py     # pruebas de la revisión de la semana 6
@@ -140,6 +143,51 @@ Cada decisión, con su verificación y su commit, está en [bitacora_ia.md](bita
 Autor: Juan Camilo Trujillo Garrido.
 
 Proyecto académico del seminario. No se ha definido una licencia de código abierto.
+
+## Funcionalidad de la semana 5: HU-02 Ingreso de lotes
+
+**Historia (HU-02, prioridad Must, necesidad N-01).** Como Administrador de Farmacia, quiero registrar el ingreso de lotes de medicamentos especificando la fecha exacta de caducidad para garantizar el control de rotación FIFO y prevenir pérdidas de inventario.
+
+**Criterio de aceptación** (documento de requisitos de la semana 3):
+
+- *Escenario 1, registro exitoso:* el Administrador ingresa 50 unidades de 'Ibuprofeno 400mg' con el lote 'L-8821' y vencimiento 15/12/2027; el sistema guarda el lote, vincula las 50 unidades y actualiza el stock total del producto.
+- *Escenario 2, error:* intenta ingresar un lote de 'Loratadina 10mg' con vencimiento 10/01/2025 (anterior a la fecha actual, 24/10/2026); el sistema rechaza el registro con el mensaje 'No se pueden ingresar lotes con fecha de vencimiento caducada'. (El resaltado en rojo del campo es de la interfaz y no forma parte de esta función.)
+
+**Contrato.**
+
+```python
+def registrar_ingreso(lotes: list[Lote], producto: str, codigo_lote: str,
+                      unidades: int, vence: date, hoy: date) -> list[Lote]: ...
+
+def stock_total(lotes: list[Lote], producto: str) -> int: ...
+```
+
+- **Recibe:** los lotes que ya existen (`Lote` está en `vencimientos.py`), los datos del lote nuevo y la fecha de hoy. La fecha de hoy se pasa como parámetro para que las pruebas no dependan del reloj.
+- **Devuelve:** una lista **nueva** con el lote agregado, ordenada por fecha de vencimiento y, si empatan, por código de lote. No modifica la lista recibida. `stock_total` suma las unidades de todos los lotes del producto (0 si no tiene).
+- **Supuestos:** el código de lote es único dentro de cada producto (el mismo código en otro producto se acepta); un lote que vence **hoy** se acepta.
+- **Errores:** `ValueError` si el producto o el código están vacíos, si las unidades son 0 o negativas, si la fecha es anterior a hoy (con el mensaje del criterio) o si el lote ya está registrado; `TypeError` si las unidades no son un entero (tampoco `bool`) o si la fecha no es un `date` (un `datetime` no vale).
+
+**Casos límite:** vence hoy (se acepta), vencido ayer (se rechaza), 1 unidad (el mínimo), lista inicial vacía, producto sin lotes (stock 0), lotes de otros productos que no se mezclan.
+
+**Ejemplos** (con `hoy = date(2026, 10, 24)`):
+
+| Entrada | Salida |
+|---|---|
+| `registrar_ingreso([], "Ibuprofeno 400mg", "L-8821", 50, date(2027, 12, 15), hoy)` | `[Lote("Ibuprofeno 400mg", "L-8821", 50, date(2027, 12, 15))]`; `stock_total` da 50 |
+| Lo anterior más `registrar_ingreso(..., "Ibuprofeno 400mg", "L-9000", 30, date(2027, 6, 1), hoy)` | lista `["L-9000", "L-8821"]` (vence antes primero); `stock_total` da 80 |
+| `registrar_ingreso([], "Loratadina 10mg", "L-777", 20, date(2025, 1, 10), hoy)` | `ValueError("No se pueden ingresar lotes con fecha de vencimiento caducada")` |
+| `registrar_ingreso([], "Vitamina C", "L-1", 1, hoy, hoy)` | un lote que vence hoy: se acepta |
+
+**Preguntas pendientes para el cliente** (decisiones que el documento no define y que quedaron así en el código): **P-07**, ¿un lote que vence el mismo día del ingreso debe aceptarse? (código: sí, porque la historia solo rechaza fechas *anteriores*); **P-08**, ¿qué debe pasar si se ingresa otra vez un código de lote ya registrado: rechazar o sumar las unidades? (código: rechazar, para no duplicar un ingreso por error).
+
+**Cómo ejecutar las pruebas.**
+
+```bash
+pytest tests/test_ingreso_lotes.py   # solo HU-02 (25 casos)
+pytest                               # todas (70)
+```
+
+**Historial de esta funcionalidad** (rama `semana5-hu02`): pruebas en rojo, implementación con pruebas en verde y refactor sin tocar las pruebas (`git log --oneline`). Entregada con retraso respecto del 7 de noviembre; la bitácora lo registra.
 
 ## Anexo A. Contrato de HU-04 (lotes por vencer)
 

@@ -1,8 +1,8 @@
 # Bitácora de uso de IA
 
-Proyecto: Inventario Tienda
+Proyecto: FarmaStock (las entradas 1 a 12 son del módulo de reposición que se propuso antes como HU-03 y hoy se llama HU-R1)
 Estudiante: Juan Camilo Trujillo Garrido
-Funcionalidad: HU-03 Ver los productos por pedir
+Funcionalidad de la semana 5: HU-02 Ingreso de lotes (entradas 18 a 22); también HU-04 (entradas 13 a 17) y HU-R1
 Asistente usado: Claude (chat). El código inicial, las pruebas y el refactor fueron generados por el asistente a partir de mis indicaciones; yo los revisé, los ejecuté y decidí qué conservar.
 
 ## Entradas
@@ -160,13 +160,62 @@ Asistente usado: Claude (chat). El código inicial, las pruebas y el refactor fu
 - **Verificación:** Revisé el diff de cada cambio (3 inserciones y 3 eliminaciones en 2 archivos) y comprobé que mi observación sobre el diff de la Entrada 11 quedó en su lugar y que la Entrada 12 volvió a su texto original.
 - **Commit relacionado:** bf80f8b Docs: corrige 3 errores de texto
 
+### Semana 5 rehecha con FarmaStock (HU-02)
+
+Esta funcionalidad reemplaza, para la entrega de la semana 5, a la historia de reposición del inventario de la tienda: HU-02 sí viene del documento de requisitos de FarmaStock. Se hizo el 2026-11-26, después de la fecha límite del 7 de noviembre. Las entradas 18 a 22 son de este trabajo.
+
+### Entrada 18
+
+- **Fecha:** 2026-11-26
+- **Prompt o sugerencia:** "Haz la semana 5 con FarmaStock, no con el inventario de tienda." El asistente propuso HU-02 (ingreso de lotes por código y fecha de vencimiento) en vez de HU-04.
+- **Decisión:** Aceptada
+- **Por qué:** La tarea exige una historia Must y HU-04 es Should; HU-02 es Must, pequeña, tiene un escenario de error claro (lote caducado, con su mensaje) y reutiliza la clase `Lote` ya existente.
+- **Verificación:** Comprobé la prioridad en la tabla MoSCoW del documento de la semana 3 y copié los dos escenarios sin cambiarlos.
+- **Commit relacionado:** a482cfc Pruebas de HU-02 FarmaStock (en rojo)
+
+### Entrada 19
+
+- **Fecha:** 2026-11-26
+- **Prompt o sugerencia:** El asistente escribió 25 casos de prueba (17 funciones, algunas parametrizadas) antes del código: 4 normales, 6 límite, el escenario de error del criterio y 14 de datos inválidos.
+- **Decisión:** Aceptada con cambios
+- **Por qué:** Cubren lo mínimo y fijan dos reglas que el documento no define: un lote que vence hoy se acepta y un código repetido en el mismo producto se rechaza. Las dejé como preguntas pendientes P-07 y P-08 en el README en vez de darlas por correctas. Cambié una línea de prueba que superaba el límite de ruff.
+- **Verificación:** Con un módulo temporal que lanza `NotImplementedError` (no confirmado) fallaron los 25 casos; sin el módulo, falla la importación. Confirmé el commit solo con el archivo de pruebas.
+- **Commit relacionado:** a482cfc
+
+### Entrada 20
+
+- **Fecha:** 2026-11-26
+- **Prompt o sugerencia:** Primera implementación: `registrar_ingreso` con las cinco validaciones dentro de la función y un `sorted` con lambda; `stock_total` con un bucle.
+- **Decisión:** Aceptada con cambios
+- **Por qué:** Cumplía el contrato, pero mezclaba validación, regla de unicidad y orden en una sola función. En el refactor las separé en `_exigir_texto`, `_exigir_unidades_validas`, `_exigir_fecha_vigente`, `_ya_esta_registrado` y `_orden_de_vencimiento`.
+- **Verificación:** Las 25 pruebas nuevas pasaron en el primer intento (70 en total), así que no atraparon un error real. Ruff encontró una línea de 90 caracteres, que partí. Hice una mutación manual de 9 cambios (por ejemplo `<` por `<=` en la fecha, o quitar la comprobación de `datetime`) y las pruebas atraparon los 9.
+- **Commit relacionado:** 22340a5 Implementa HU-02 (pruebas en verde)
+
+### Entrada 21
+
+- **Fecha:** 2026-11-26
+- **Prompt o sugerencia:** Rechazar un lote repetido sumando las unidades al lote existente, o rechazarlo con error.
+- **Decisión:** Rechazada (la opción de sumar)
+- **Por qué:** Sumar ocultaría un ingreso duplicado por error y el documento no lo pide. Elegí lanzar `ValueError` y lo dejé como pregunta pendiente P-08 para el cliente.
+- **Verificación:** La prueba `test_codigo_de_lote_repetido_para_el_mismo_producto_se_rechaza` fija el comportamiento; una mutación que quita la comprobación la hizo fallar.
+- **Commit relacionado:** 22340a5
+
+### Entrada 22
+
+- **Fecha:** 2026-11-26
+- **Prompt o sugerencia:** Refactor con las pruebas en verde: dividir las validaciones, nombrar el orden (antes un lambda) y usar `any` y `sum`.
+- **Decisión:** Aceptada
+- **Por qué:** Cada paso de `registrar_ingreso` ahora se lee por su nombre y el comportamiento no cambia.
+- **Verificación:** `pytest` dio 70 de 70 antes y después, `ruff check .` limpio y `git diff` de `tests/` vacío entre el commit verde y el refactor.
+- **Commit relacionado:** 22817c9 Refactor HU-02
+
 ## Resumen
 
 | Decisión | Cantidad |
 |---|---|
-| Aceptadas | 10 |
-| Aceptadas con cambios | 3 |
-| Rechazadas | 4 |
+| Aceptadas | 12 |
+| Aceptadas con cambios | 5 |
+| Rechazadas | 5 |
 
 ## Errores que atraparon las pruebas
 
@@ -175,6 +224,10 @@ El código generado pasó las 10 pruebas en la primera ejecución, así que las 
 ### Semana 6
 
 Las pruebas de la semana 5 no detectaron dos errores reales del código, porque no probaban esos casos: el orden por nombre con mayúsculas y tildes (H-01) y los datos que no son enteros, como `NaN` (H-02). Los encontró la revisión: escribí pruebas nuevas, las vi fallar en rojo y luego las puse en verde con el arreglo. Las 10 pruebas originales no cambiaron de lógica.
+
+### Semana 5 con HU-02
+
+Las 25 pruebas pasaron a la primera, así que no atraparon un error del código. La mutación manual de 9 cambios las atrapó todas. Lo útil fue que, al escribirlas, aparecieron dos reglas que el documento no define (lote que vence hoy y código repetido) y quedaron como preguntas pendientes P-07 y P-08.
 
 ### Etapa final
 
