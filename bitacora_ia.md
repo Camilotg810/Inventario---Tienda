@@ -115,13 +115,58 @@ Asistente usado: Claude (chat). El código inicial, las pruebas y el refactor fu
 - **Verificación:** Comprobé que hoy la `ñ` se ordena como `n` (`Ñame` antes que `Nuez`) y que solo afecta el desempate entre productos con el mismo faltante. Quedó documentado en el README (supuestos) y en `revision_seguridad.md`, sección 4.
 - **Commit relacionado:** ninguno (pendiente documentado en el informe)
 
+### Entrada 13
+
+- **Fecha:** 2026-11-26
+- **Prompt o sugerencia:** "Sigamos del proyecto que estamos, que es FarmaStock; no quiero que me des otros proyectos diferentes." El asistente propuso alinear el repositorio con FarmaStock implementando una historia real del documento de requisitos de la semana 3 (HU-04, vencimientos a 60 días) y ajustar el README.
+- **Decisión:** Aceptada
+- **Por qué:** El proyecto declarado es FarmaStock y el código de las semanas 5 y 6 no correspondía a ninguna de sus 9 historias. HU-04 es pequeña, no necesita base de datos y trae dos escenarios con datos concretos (uno de éxito y uno de error). No se creó ningún proyecto nuevo.
+- **Verificación:** Comparé los datos de las pruebas con el escenario 1 del documento (lote L-102, Vitamina C, 10 unidades, vence el 10/11/2026) y con el mensaje del escenario 2 («El rango de días debe ser un número entero mayor a 0»). El README aclara que la reposición de la semana 5 no es una de las 9 historias y pasa a llamarse HU-R1 para no confundirla con la HU-03 (fiado).
+- **Commit relacionado:** a4ebffa Implementa HU-04 y 287fe91 README de FarmaStock
+
+### Entrada 14
+
+- **Fecha:** 2026-11-26
+- **Prompt o sugerencia:** Escribir las pruebas de HU-04 antes del código, a partir de los dos escenarios Gherkin y de los casos límite. El asistente propuso 27 pruebas: la lista ordenada con producto, lote, unidades y días restantes, los límites del rango (día 60 incluido, día 61 y vencidos excluidos, vence hoy), el rango por defecto, el desempate, la lista vacía, no modificar la entrada y los errores de `dias`, unidades y fecha.
+- **Decisión:** Aceptada
+- **Por qué:** Cada regla del contrato tiene su prueba, y los errores se rechazan en vez de ignorarse, como aprendí en H-02 de la semana 6.
+- **Verificación:** Con un stub que lanza `NotImplementedError` fallaron las 27 nuevas y las 18 anteriores siguieron pasando. Tras implementar pasaron las 45. Hice una prueba de mutación manual de 6 cambios (`<=` por `<` en el rango, quitar `0 <=`, orden invertido, aceptar `dias = 0`, aceptar `bool`, no validar lotes) y cada cambio hizo fallar al menos una prueba; al restaurar volvieron las 45 en verde. No se tocó ningún archivo de las pruebas de las semanas 5 y 6.
+- **Commit relacionado:** 98b7bfb Pruebas de HU-04 (en rojo) y a4ebffa Implementa HU-04 (en verde)
+
+### Entrada 15
+
+- **Fecha:** 2026-11-26
+- **Prompt o sugerencia:** Al implementar, el asistente señaló dos puntos que el documento no define: si el reporte debe mostrar los lotes ya vencidos y si deben aparecer los lotes con 0 unidades. Una opción era decidirlos en el código (por ejemplo, ocultar los lotes agotados).
+- **Decisión:** Rechazada
+- **Por qué:** La historia no lo dice y la tarea de requisitos pide que lo que no tiene origen vaya a preguntas pendientes, no al código. Decidirlo sería inventar un requisito. Hoy el código no muestra los vencidos y sí muestra los de 0 unidades, y ambas cosas quedaron escritas como supuestos.
+- **Verificación:** Revisé que el texto de HU-04 en el documento de la semana 3 no mencione ninguno de los dos casos. Quedaron como P-05 y P-06 en el Anexo A del README, con lo que hace el código hoy, y hay una prueba que fija cada comportamiento.
+- **Commit relacionado:** a4ebffa Implementa HU-04 y 287fe91 README de FarmaStock
+
+### Entrada 16
+
+- **Fecha:** 2026-11-26
+- **Prompt o sugerencia:** Crear un pipeline de integración continua que ejecute ruff, pytest y pip-audit. El asistente propuso un archivo de GitHub Actions (`.github/workflows/ci.yml`) que se ejecuta en cada push y pull request, con Python 3.12 y 3.14, con permisos de solo lectura.
+- **Decisión:** Aceptada
+- **Por qué:** Son las mismas tres comprobaciones que ya hacía a mano desde la semana 6, ahora automáticas. No agregué despliegue porque el proyecto todavía no tiene nada que desplegar.
+- **Verificación:** Comprobé que el YAML es válido y repetí sus pasos en una carpeta limpia con un entorno nuevo (Python 3.12): ruff sin avisos, 45 pruebas en verde y pip-audit sin vulnerabilidades. Python 3.14 no se probó en esa simulación. La ejecución real en GitHub se ve en la pestaña Actions después de subir los cambios.
+- **Commit relacionado:** d352916 CI: pipeline de GitHub Actions
+
+### Entrada 17
+
+- **Fecha:** 2026-11-26
+- **Prompt o sugerencia:** Revisar mis cambios de la semana 6 antes de seguir. El asistente encontró tres errores de texto en mis ediciones: el informe de seguridad decía `Juan Camilo Trujillo` donde iba el marcador `[nombre y apellido]`, la Entrada 12 tenía mi observación del diff en el campo "Commit relacionado" y la verificación de la Entrada 11 era confusa.
+- **Decisión:** Aceptada
+- **Por qué:** Eran errores míos al editar, no del código. Dejaban afirmaciones falsas o confusas en el informe y en la bitácora.
+- **Verificación:** Revisé el diff de cada cambio (3 inserciones y 3 eliminaciones en 2 archivos) y comprobé que mi observación sobre el diff de la Entrada 11 quedó en su lugar y que la Entrada 12 volvió a su texto original.
+- **Commit relacionado:** bf80f8b Docs: corrige 3 errores de texto
+
 ## Resumen
 
 | Decisión | Cantidad |
 |---|---|
-| Aceptadas | 6 |
+| Aceptadas | 10 |
 | Aceptadas con cambios | 3 |
-| Rechazadas | 3 |
+| Rechazadas | 4 |
 
 ## Errores que atraparon las pruebas
 
@@ -130,6 +175,10 @@ El código generado pasó las 10 pruebas en la primera ejecución, así que las 
 ### Semana 6
 
 Las pruebas de la semana 5 no detectaron dos errores reales del código, porque no probaban esos casos: el orden por nombre con mayúsculas y tildes (H-01) y los datos que no son enteros, como `NaN` (H-02). Los encontró la revisión: escribí pruebas nuevas, las vi fallar en rojo y luego las puse en verde con el arreglo. Las 10 pruebas originales no cambiaron de lógica.
+
+### Etapa final
+
+Las 27 pruebas de HU-04 se escribieron antes del código y fallaron todas con el stub, así que no hubo un error del código que ellas atraparan. Para saber si protegen el comportamiento hice una prueba de mutación manual de 6 cambios y las pruebas detectaron los 6. Además, la IA señaló dos reglas que el documento de requisitos no define (lotes vencidos y lotes con 0 unidades) y las dejé como preguntas pendientes en vez de decidirlas en el código.
 
 ## Reflexión final (5 a 8 líneas)
 
