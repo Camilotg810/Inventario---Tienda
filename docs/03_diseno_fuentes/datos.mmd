@@ -1,0 +1,86 @@
+erDiagram
+  USUARIO ||--o{ VENTA : "registra (cajero)"
+  USUARIO ||--o{ CIERRE_CAJA : "realiza (administrador)"
+  PRODUCTO ||--o{ LOTE : "tiene"
+  LOTE ||--o{ DETALLE_VENTA : "se descuenta en"
+  VENTA ||--|{ DETALLE_VENTA : "contiene"
+  GRUPO_CLIENTE ||--o{ CLIENTE : "agrupa"
+  CLIENTE |o--o{ VENTA : "compra a su nombre"
+  CLIENTE ||--o{ MOVIMIENTO_CREDITO : "tiene"
+  VENTA |o--o| MOVIMIENTO_CREDITO : "origina si es fiada"
+
+  USUARIO {
+    int id PK
+    string nombre
+    string usuario UK
+    string clave_hash
+    string rol
+    bool activo
+  }
+  PRODUCTO {
+    int id PK
+    string nombre_comercial
+    string principio_activo
+    string concentracion
+    decimal precio_unitario
+    bool activo
+  }
+  LOTE {
+    int id PK
+    int producto_id FK
+    string codigo_lote
+    date fecha_vencimiento
+    int unidades
+  }
+  GRUPO_CLIENTE {
+    int id PK
+    string nombre UK
+    decimal descuento_porcentaje
+  }
+  CLIENTE {
+    int id PK
+    string nombre
+    int grupo_id FK
+    decimal cupo_credito
+  }
+  VENTA {
+    int id PK
+    string numero_comprobante UK
+    string uuid_venta UK
+    datetime fecha_hora
+    int cajero_id FK
+    int cliente_id FK
+    string forma_pago
+    decimal subtotal
+    decimal descuento
+    decimal total
+    decimal efectivo_recibido
+  }
+  DETALLE_VENTA {
+    int id PK
+    int venta_id FK
+    int lote_id FK
+    int cantidad
+    decimal precio_unitario
+  }
+  MOVIMIENTO_CREDITO {
+    int id PK
+    int cliente_id FK
+    int venta_id FK
+    string tipo
+    decimal monto
+    datetime fecha
+    string numero_recibo UK
+  }
+  CIERRE_CAJA {
+    int id PK
+    date fecha
+    int administrador_id FK
+    decimal fondo_base
+    decimal esperado
+    decimal contado
+    decimal diferencia
+    string estado
+    string nota_justificacion
+    string numero_reporte_z UK
+  }

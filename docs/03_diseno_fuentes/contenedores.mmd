@@ -1,0 +1,16 @@
+flowchart LR
+  cajero["<b>Cajero</b><br/>[Persona]"]
+  admin["<b>Administrador de farmacia</b><br/>[Persona]"]
+  subgraph sis["FarmaStock [Límite del sistema]"]
+    web["<b>Aplicación web (PWA)</b><br/>[Contenedor: HTML, JavaScript,<br/>Service Worker, IndexedDB]<br/>Pantallas de venta y administración;<br/>sin internet guarda hasta 500 ventas<br/>en efectivo en el navegador"]
+    app["<b>Servidor de aplicación</b><br/>[Contenedor: Python, Django]<br/>Reglas de stock, cupo, abonos,<br/>descuentos y cierre de caja;<br/>usa el módulo inventario (HU-04)"]
+    db[("<b>Base de datos</b><br/>[Contenedor: PostgreSQL]<br/>Productos, lotes, clientes, ventas,<br/>abonos y cierres de caja")]
+  end
+  cajero -->|"Vende, cobra y registra abonos<br/>[HTTPS]"| web
+  admin -->|"Ingresa lotes, aprueba cupos<br/>y cierra caja [HTTPS]"| web
+  web -->|"Envía ventas y consultas; al volver la red<br/>reenvía las ventas guardadas [HTTPS, JSON]"| app
+  app -->|"Lee y escribe ventas, lotes y cartera<br/>[SQL, TCP]"| db
+  classDef persona fill:#08427b,stroke:#052e56,color:#fff
+  classDef cont fill:#438dd5,stroke:#2e6295,color:#fff
+  class cajero,admin persona
+  class web,app,db cont

@@ -1,0 +1,10 @@
+flowchart LR
+  cajero["<b>Cajero</b><br/>[Persona]<br/>Atiende en el mostrador: vende,<br/>cobra y registra abonos"]
+  admin["<b>Administrador de farmacia</b><br/>[Persona]<br/>Ingresa lotes, aprueba cupos<br/>de crédito y cierra la caja"]
+  sistema["<b>FarmaStock</b><br/>[Sistema de software]<br/>Controla el inventario por lote, las ventas<br/>en efectivo y fiadas y la cartera"]
+  cajero -->|"Registra ventas y abonos<br/>[HTTPS, navegador]"| sistema
+  admin -->|"Ingresa lotes, consulta vencimientos,<br/>aprueba cupos y cierra caja<br/>[HTTPS, navegador]"| sistema
+  classDef persona fill:#08427b,stroke:#052e56,color:#fff
+  classDef sis fill:#1168bd,stroke:#0b4884,color:#fff
+  class cajero,admin persona
+  class sistema sis

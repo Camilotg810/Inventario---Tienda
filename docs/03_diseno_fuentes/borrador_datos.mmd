@@ -1,0 +1,16 @@
+erDiagram
+  CLIENTE { int id PK
+    string nombre
+    int grupo_id FK
+    decimal cupo_credito
+    decimal saldo_adeudado }
+  VENTA { int id PK
+    string numero_comprobante
+    datetime fecha_hora
+    int cajero_id FK
+    int cliente_id FK
+    string forma_pago
+    decimal total
+    decimal efectivo_recibido
+    decimal cambio }
+  CLIENTE ||--o{ VENTA : compra

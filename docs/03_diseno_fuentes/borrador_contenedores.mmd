@@ -1,0 +1,17 @@
+C4Container
+  title Contenedores de FarmaStock (borrador)
+  Person(cajero, "Cajero")
+  Person(admin, "Administrador")
+  System_Boundary(sis, "FarmaStock") {
+    Container(pwa, "Aplicación web", "HTML, JavaScript, Service Worker", "Punto de venta y administración")
+    Container(api, "Servidor de aplicación", "Python, Django", "Reglas de stock, cupo, abonos y cierre")
+    Container(cola, "Cola de mensajes", "RabbitMQ", "Sincroniza ventas sin conexión")
+    ContainerDb(db, "Base de datos", "PostgreSQL", "Productos, lotes, ventas y cartera")
+  }
+  System_Ext(qr, "Pasarela de Pagos QR", "Confirma pagos")
+  Rel(cajero, pwa, "Vende y cobra", "HTTPS")
+  Rel(admin, pwa, "Administra", "HTTPS")
+  Rel(pwa, api, "Envía ventas", "HTTPS, JSON")
+  Rel(api, cola, "Publica ventas", "AMQP")
+  Rel(api, db, "Lee y escribe", "SQL")
+  Rel(api, qr, "Valida pagos", "HTTPS")

@@ -1,0 +1,9 @@
+C4Context
+  title Contexto de FarmaStock (borrador)
+  Person(cajero, "Cajero", "Registra ventas en efectivo o fiado")
+  Person(admin, "Administrador", "Ingresa lotes, aprueba cupos y cierra caja")
+  System(sistema, "FarmaStock", "Inventario por lote, ventas y cartera")
+  System_Ext(qr, "Pasarela de Pagos QR", "Confirma pagos por QR")
+  Rel(cajero, sistema, "Registra ventas y abonos")
+  Rel(admin, sistema, "Administra lotes y cierra caja")
+  Rel(sistema, qr, "Valida pagos", "HTTPS")
