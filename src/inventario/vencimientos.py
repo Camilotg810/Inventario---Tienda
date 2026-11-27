@@ -40,6 +40,12 @@ def _validar_dias(dias: int) -> None:
         raise ValueError(MENSAJE_DIAS_INVALIDOS)
 
 
+def _validar_hoy(hoy: date) -> None:
+    """Lanza TypeError si `hoy` no es un `date` (un `datetime` tampoco vale)."""
+    if not isinstance(hoy, date) or isinstance(hoy, datetime):
+        raise TypeError(f"La fecha de hoy debe ser un date, se recibió {hoy!r}")
+
+
 def _validar_lote(lote: Lote) -> None:
     """Lanza TypeError o ValueError, con el código del lote, si sus datos no valen."""
     codigo, unidades = lote.codigo_lote, lote.unidades
@@ -85,11 +91,13 @@ def lotes_por_vencer(
     Lanza:
         ValueError: si `dias` no es un entero mayor a 0, o si un lote tiene
             unidades negativas (el mensaje incluye el código del lote).
-        TypeError: si las unidades de un lote no son un entero o su fecha de
-            vencimiento no es un `date` (el mensaje incluye el código del lote).
+        TypeError: si `hoy` no es un `date`, o si las unidades de un lote no son
+            un entero o su fecha de vencimiento no es un `date` (en los lotes, el
+            mensaje incluye el código del lote).
         Se validan todos los lotes antes de filtrar, así que un dato inválido nunca
         se ignora aunque el lote esté fuera del rango.
     """
+    _validar_hoy(hoy)
     _validar_dias(dias)
     for lote in lotes:
         _validar_lote(lote)

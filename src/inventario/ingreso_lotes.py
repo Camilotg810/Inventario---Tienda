@@ -21,6 +21,12 @@ def _exigir_unidades_validas(unidades: int) -> None:
         raise ValueError(f"Las unidades deben ser mayores a 0 (se recibió {unidades})")
 
 
+def _exigir_hoy_valido(hoy: date) -> None:
+    """Lanza TypeError si `hoy` no es un `date` (un `datetime` tampoco vale)."""
+    if not isinstance(hoy, date) or isinstance(hoy, datetime):
+        raise TypeError(f"La fecha de hoy debe ser un date, se recibió {hoy!r}")
+
+
 def _exigir_fecha_vigente(vence: date, hoy: date) -> None:
     """Lanza TypeError si no es un `date` y ValueError si ya está caducada.
 
@@ -64,11 +70,13 @@ def registrar_ingreso(
     """Devuelve una lista nueva con el lote agregado, ordenada por vencimiento.
 
     No modifica `lotes`. Lanza TypeError o ValueError si los datos no valen,
-    o si el lote ya está registrado para ese producto.
+    o si el lote ya está registrado para ese producto (sin distinguir
+    mayúsculas ni espacios de más en el nombre).
     """
     _exigir_texto(producto, "El producto")
     _exigir_texto(codigo_lote, "El código de lote")
     _exigir_unidades_validas(unidades)
+    _exigir_hoy_valido(hoy)
     _exigir_fecha_vigente(vence, hoy)
     if _ya_esta_registrado(lotes, producto, codigo_lote):
         raise ValueError(f"El lote {codigo_lote} de {producto} ya está registrado")
