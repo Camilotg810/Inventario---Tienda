@@ -3,6 +3,8 @@
 import unicodedata
 from dataclasses import dataclass
 
+from inventario.validaciones import es_entero
+
 
 @dataclass(frozen=True)
 class Producto:
@@ -37,7 +39,7 @@ def _exigir_entero_no_negativo(codigo: str, descripcion: str, valor: int) -> Non
     Lanza TypeError si `valor` no es un entero (un bool tampoco vale) y
     ValueError si es negativo.
     """
-    if isinstance(valor, bool) or not isinstance(valor, int):
+    if not es_entero(valor):
         raise TypeError(
             f"Producto {codigo}: {descripcion} debe ser un entero, "
             f"se recibió {valor!r}"

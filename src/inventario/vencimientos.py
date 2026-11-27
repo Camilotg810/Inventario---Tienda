@@ -1,7 +1,9 @@
 """Vencimientos de FarmaStock: qué lotes vencen pronto (HU-04)."""
 
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date
+
+from inventario.validaciones import es_entero, es_fecha
 
 MENSAJE_DIAS_INVALIDOS = "El rango de días debe ser un número entero mayor a 0"
 
@@ -36,20 +38,20 @@ class LoteProximo:
 
 def _validar_dias(dias: int) -> None:
     """Lanza ValueError si `dias` no es un entero mayor a 0 (un bool no vale)."""
-    if isinstance(dias, bool) or not isinstance(dias, int) or dias <= 0:
+    if not es_entero(dias) or dias <= 0:
         raise ValueError(MENSAJE_DIAS_INVALIDOS)
 
 
 def _validar_hoy(hoy: date) -> None:
     """Lanza TypeError si `hoy` no es un `date` (un `datetime` tampoco vale)."""
-    if not isinstance(hoy, date) or isinstance(hoy, datetime):
+    if not es_fecha(hoy):
         raise TypeError(f"La fecha de hoy debe ser un date, se recibió {hoy!r}")
 
 
 def _validar_lote(lote: Lote) -> None:
     """Lanza TypeError o ValueError, con el código del lote, si sus datos no valen."""
     codigo, unidades = lote.codigo_lote, lote.unidades
-    if isinstance(unidades, bool) or not isinstance(unidades, int):
+    if not es_entero(unidades):
         raise TypeError(
             f"Lote {codigo}: las unidades deben ser un entero, se recibió {unidades!r}"
         )
@@ -57,7 +59,7 @@ def _validar_lote(lote: Lote) -> None:
         raise ValueError(
             f"Lote {codigo}: las unidades no pueden ser negativas ({unidades})"
         )
-    if not isinstance(lote.vence, date) or isinstance(lote.vence, datetime):
+    if not es_fecha(lote.vence):
         raise TypeError(
             f"Lote {codigo}: la fecha de vencimiento debe ser un date, "
             f"se recibió {lote.vence!r}"

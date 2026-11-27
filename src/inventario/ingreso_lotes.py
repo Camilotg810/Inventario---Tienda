@@ -1,7 +1,8 @@
 """Ingreso de mercancía de FarmaStock: registrar lotes y consultar el stock (HU-02)."""
 
-from datetime import date, datetime
+from datetime import date
 
+from inventario.validaciones import es_entero, es_fecha
 from inventario.vencimientos import Lote
 
 MENSAJE_LOTE_CADUCADO = "No se pueden ingresar lotes con fecha de vencimiento caducada"
@@ -15,7 +16,7 @@ def _exigir_texto(valor: str, nombre: str) -> None:
 
 def _exigir_unidades_validas(unidades: int) -> None:
     """Lanza TypeError si no es un entero (un bool no vale) y ValueError si es <= 0."""
-    if isinstance(unidades, bool) or not isinstance(unidades, int):
+    if not es_entero(unidades):
         raise TypeError(f"Las unidades deben ser un entero, se recibió {unidades!r}")
     if unidades <= 0:
         raise ValueError(f"Las unidades deben ser mayores a 0 (se recibió {unidades})")
@@ -23,7 +24,7 @@ def _exigir_unidades_validas(unidades: int) -> None:
 
 def _exigir_hoy_valido(hoy: date) -> None:
     """Lanza TypeError si `hoy` no es un `date` (un `datetime` tampoco vale)."""
-    if not isinstance(hoy, date) or isinstance(hoy, datetime):
+    if not es_fecha(hoy):
         raise TypeError(f"La fecha de hoy debe ser un date, se recibió {hoy!r}")
 
 
@@ -32,7 +33,7 @@ def _exigir_fecha_vigente(vence: date, hoy: date) -> None:
 
     Un lote que vence hoy se acepta: la historia solo rechaza fechas anteriores.
     """
-    if not isinstance(vence, date) or isinstance(vence, datetime):
+    if not es_fecha(vence):
         raise TypeError(
             f"La fecha de vencimiento debe ser un date, se recibió {vence!r}"
         )
