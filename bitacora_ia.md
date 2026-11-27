@@ -209,13 +209,53 @@ Esta funcionalidad reemplaza, para la entrega de la semana 5, a la historia de r
 - **Verificación:** `pytest` dio 70 de 70 antes y después, `ruff check .` limpio y `git diff` de `tests/` vacío entre el commit verde y el refactor.
 - **Commit relacionado:** 22817c9 Refactor HU-02
 
+### Semana 6 con FarmaStock (revisión de HU-02, HU-04 y HU-R1)
+
+Segunda ronda de la revisión de la semana 6, hecha el 2026-11-27 sobre todo el código actual. No usé un agente de código: las correcciones las hice yo con el asistente en el chat, una por commit, en la rama `semana6-revision-farmastock`. Entradas 23 a 26.
+
+### Entrada 23
+
+- **Fecha:** 2026-11-27
+- **Prompt o sugerencia:** El prompt de revisión de la semana sobre `ingreso_lotes.py`, `vencimientos.py`, `reposicion.py` y sus pruebas. El asistente devolvió 3 hallazgos seguros y 5 sospechas.
+- **Decisión:** Aceptada con cambios
+- **Por qué:** Los 3 seguros eran reales (H-09, H-10, H-11); de las 5 sospechas, 3 eran falsos positivos, 1 se confirmó pero no tiene regla en los requisitos (sin tope de unidades, queda como P-09) y 1 era una decisión de diseño. No copié ninguna sin ejecutarla.
+- **Verificación:** Ejecuté cada caso en Python (dos ingresos con el mismo código y el nombre escrito distinto, `hoy` con `None` y `datetime`, `unidades=10**18`, lista con un `1`) y busqué `isinstance` en `src/`. Lo que la IA no encontró (control de acceso de HU-02, acciones de CI fijadas por etiqueta, el docstring con HU-03) está en `revision_seguridad.md`.
+- **Commit relacionado:** 21f5051 Pruebas de la revisión (en rojo)
+
+### Entrada 24
+
+- **Fecha:** 2026-11-27
+- **Prompt o sugerencia:** Corregir H-09: comparar el producto sin mayúsculas ni espacios de más al buscar el stock y al revisar si el código de lote ya existe.
+- **Decisión:** Aceptada
+- **Por qué:** Un lote repetido pasaba solo por escribir el nombre distinto y el stock quedaba partido, lo que va contra el objetivo de HU-02 (controlar el inventario por lote). Elegí normalizar solo para comparar y no el texto guardado, para no alterar lo que el administrador escribió.
+- **Verificación:** 5 pruebas nuevas fallaron en rojo antes y pasaron después (83 en total); `ruff check .` limpio; ninguna prueba existente se modificó.
+- **Commit relacionado:** 69f2253 Fix H-09
+
+### Entrada 25
+
+- **Fecha:** 2026-11-27
+- **Prompt o sugerencia:** Validar `hoy` en las dos funciones (H-10) y mover las comprobaciones repetidas de tipo a `validaciones.py` (H-11).
+- **Decisión:** Aceptada
+- **Por qué:** H-10 cambia un mensaje de error confuso por uno que nombra el dato, y H-11 quita una comprobación escrita 4 y 3 veces en tres módulos. El refactor no cambia el comportamiento.
+- **Verificación:** Las 8 pruebas de `hoy` pasaron a verde; tras el refactor, 83 de 83 y `git diff` de `tests/` vacío entre los commits fa3b87f y 2aa5151.
+- **Commit relacionado:** fa3b87f Fix H-10 y 2aa5151 Refactor H-11
+
+### Entrada 26
+
+- **Fecha:** 2026-11-27
+- **Prompt o sugerencia:** Dos propuestas: poner un tope de 10.000 unidades por lote en `registrar_ingreso`, y unir los dos `_orden_de_vencimiento` en una sola función.
+- **Decisión:** Rechazada
+- **Por qué:** El tope sería una regla inventada: el documento de requisitos no define un máximo; la dejé como pregunta P-09 para el cliente. Unir las funciones obligaba a que un módulo dependa del otro por una línea, y cada una recibe un tipo distinto.
+- **Verificación:** Comprobé en el documento de la semana 3 que HU-02 no menciona un máximo, y que los dos orden reciben `Lote` y `LoteProximo`.
+- **Commit relacionado:** ninguno (no se cambió el código)
+
 ## Resumen
 
 | Decisión | Cantidad |
 |---|---|
-| Aceptadas | 12 |
-| Aceptadas con cambios | 5 |
-| Rechazadas | 5 |
+| Aceptadas | 14 |
+| Aceptadas con cambios | 6 |
+| Rechazadas | 6 |
 
 ## Errores que atraparon las pruebas
 
@@ -224,6 +264,10 @@ El código generado pasó las 10 pruebas en la primera ejecución, así que las 
 ### Semana 6
 
 Las pruebas de la semana 5 no detectaron dos errores reales del código, porque no probaban esos casos: el orden por nombre con mayúsculas y tildes (H-01) y los datos que no son enteros, como `NaN` (H-02). Los encontró la revisión: escribí pruebas nuevas, las vi fallar en rojo y luego las puse en verde con el arreglo. Las 10 pruebas originales no cambiaron de lógica.
+
+### Semana 6 con FarmaStock
+
+La revisión encontró dos errores reales que las 70 pruebas anteriores no cubrían: el mismo producto escrito con otras mayúsculas o espacios se contaba como otro (H-09) y un `hoy` inválido fallaba con un mensaje poco claro (H-10). Escribí las 13 pruebas nuevas, las vi fallar y luego las pasé a verde. La IA no vio lo más importante para la seguridad futura: que HU-02 es solo del Administrador y nada lo comprueba todavía; quedó como pendiente con su prueba de abuso planeada.
 
 ### Semana 5 con HU-02
 

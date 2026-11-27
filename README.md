@@ -2,7 +2,7 @@
 
 ## 1. Qué es
 
-FarmaStock es el proyecto final del seminario: un sistema de gestión de inventario y ventas para farmacias comunitarias pequeñas. Controla los medicamentos por lote y fecha de vencimiento, las ventas en efectivo y a crédito (fiado) y el cierre de caja. Sus requisitos están en el documento de requisitos de la semana 3, con 9 historias de usuario. Las necesidades de ese documento están **por validar con un cliente** (preguntas pendientes P-01 a P-04 del documento de la semana 3, y P-05 y P-06 en el Anexo A).
+FarmaStock es el proyecto final del seminario: un sistema de gestión de inventario y ventas para farmacias comunitarias pequeñas. Controla los medicamentos por lote y fecha de vencimiento, las ventas en efectivo y a crédito (fiado) y el cierre de caja. Sus requisitos están en el documento de requisitos de la semana 3, con 9 historias de usuario. Las necesidades de ese documento están **por validar con un cliente** (preguntas pendientes P-01 a P-04 del documento de la semana 3, P-05 y P-06 en el Anexo A, y P-07, P-08 y P-09 en la sección de la semana 5 y en `revision_seguridad.md`).
 
 Este repositorio contiene el módulo de inventario, que es la parte implementada hasta ahora:
 
@@ -97,7 +97,7 @@ filas = lotes_por_vencer([Lote("Vitamina C", "L-102", 10, date(2026, 11, 10))], 
 pytest
 ```
 
-Hay 70 pruebas: 25 de HU-02, 10 de la propuesta de reposición, 8 de la revisión de la semana 6 y 27 de HU-04. Otras comprobaciones de calidad y seguridad:
+Hay 83 pruebas: 25 de HU-02, 27 de HU-04, 10 de la propuesta de reposición, 8 de la primera revisión de la semana 6 y 13 de la segunda (`tests/test_revision_farmastock.py`). Otras comprobaciones de calidad y seguridad:
 
 ```bash
 ruff check .                    # linter con reglas E, F, B y S (seguridad); configurado en pyproject.toml
@@ -113,11 +113,13 @@ El informe de la revisión de código y seguridad está en [revision_seguridad.m
 ```
 src/inventario/ingreso_lotes.py    # HU-02: ingreso de lotes (semana 5)
 src/inventario/vencimientos.py     # HU-04: lotes por vencer
+src/inventario/validaciones.py     # comprobaciones de tipo compartidas
 src/inventario/reposicion.py       # HU-R1: productos por pedir
 tests/test_ingreso_lotes.py        # pruebas de HU-02
 tests/test_vencimientos.py         # pruebas de HU-04
 tests/test_reposicion.py           # pruebas de la semana 5
-tests/test_revision_semana6.py     # pruebas de la revisión de la semana 6
+tests/test_revision_semana6.py     # pruebas de la primera revisión de la semana 6
+tests/test_revision_farmastock.py  # pruebas de la segunda revisión (H-09, H-10)
 ejemplo.py                         # ejemplo ejecutable
 .github/workflows/ci.yml           # pipeline de integración continua
 pyproject.toml                     # configuración de ruff
@@ -184,7 +186,7 @@ def stock_total(lotes: list[Lote], producto: str) -> int: ...
 
 ```bash
 pytest tests/test_ingreso_lotes.py   # solo HU-02 (25 casos)
-pytest                               # todas (70)
+pytest                               # todas (83)
 ```
 
 **Historial de esta funcionalidad** (rama `semana5-hu02`): pruebas en rojo, implementación con pruebas en verde y refactor sin tocar las pruebas (`git log --oneline`). Entregada con retraso respecto del 7 de noviembre; la bitácora lo registra.
