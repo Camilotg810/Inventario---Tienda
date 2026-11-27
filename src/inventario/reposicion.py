@@ -1,4 +1,4 @@
-"""Reposición de inventario: qué productos hay que pedir (HU-03)."""
+"""Reposición: qué productos hay que pedir (HU-R1; en la semana 5 se llamó HU-03)."""
 
 import unicodedata
 from dataclasses import dataclass
