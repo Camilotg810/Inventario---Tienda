@@ -249,13 +249,35 @@ Segunda ronda de la revisión de la semana 6, hecha el 2026-11-27 sobre todo el 
 - **Verificación:** Comprobé en el documento de la semana 3 que HU-02 no menciona un máximo, y que los dos orden reciben `Lote` y `LoteProximo`.
 - **Commit relacionado:** ninguno (no se cambió el código)
 
+### Etapa final: informe y diapositivas (2026-11-27)
+
+Entradas 27 y 28, del informe final (`docs/informe_final.md` y `.pdf`) y de las diapositivas (`docs/diapositivas.pdf`).
+
+### Entrada 27
+
+- **Fecha:** 2026-11-27
+- **Prompt o sugerencia:** Redactar el informe final con la plantilla del módulo 7 y preparar 8 diapositivas, con evidencias reales enlazadas (archivos, commits, bitácora, pipeline).
+- **Decisión:** Aceptada con cambios
+- **Por qué:** El borrador cumple la estructura de la plantilla, pero corregí dos cosas: una frase decía «segunda revisión con IA» para un caso que fue de la primera ronda, y la tarea de la semana 7 no figura como entregada en Q10, así que el informe lo dice sin adornos. Las reflexiones son un borrador que debo revisar y ajustar a lo que de verdad pienso.
+- **Verificación:** Comprobé cada hash de commit con `git log`, los 26 enlaces del informe contra los archivos del repositorio, el conteo de pruebas (83) con `pytest`, y la ejecución del pipeline abriendo la página de GitHub Actions: ejecución #1 en `main`, commit 0499433, verde en Python 3.12 y 3.14. Las dos salidas de la diapositiva 5 las generé ejecutando el código de los commits b570a5e y 69f2253.
+- **Commit relacionado:** el que agrega `docs/informe_final.pdf` y `docs/diapositivas.pdf`
+
+### Entrada 28
+
+- **Fecha:** 2026-11-27
+- **Prompt o sugerencia:** Redactar rápido el plan de pruebas, la guía de despliegue y el plan de operación para que la carpeta `docs/` quedara completa.
+- **Decisión:** Rechazada
+- **Por qué:** El proyecto no tiene servidor, base de datos ni interfaz, así que una guía de despliegue y un plan de operación serían texto sin nada real que describir, y un plan de pruebas escrito a última hora tampoco tendría evidencia. Prefiero listarlos como pendientes en el informe (sección 5).
+- **Verificación:** Revisé el repositorio: solo hay funciones y pruebas, y el pipeline; lo dejé escrito en `docs/LEEME.md` y en el informe.
+- **Commit relacionado:** ninguno (pendiente documentado)
+
 ## Resumen
 
 | Decisión | Cantidad |
 |---|---|
 | Aceptadas | 14 |
-| Aceptadas con cambios | 6 |
-| Rechazadas | 6 |
+| Aceptadas con cambios | 7 |
+| Rechazadas | 7 |
 
 ## Errores que atraparon las pruebas
 

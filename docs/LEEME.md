@@ -9,7 +9,7 @@
 | 3. Diseño | Documento de diseño con ADR-001, C4, modelo de datos y API | [03_diseno_S4.pdf](03_diseno_S4.pdf) |
 | 3. Diseño | Código fuente de los diagramas (Mermaid) e imágenes | [03_diseno_fuentes/](03_diseno_fuentes/) |
 | 4. Código | Contratos y pruebas | [README.md](../README.md), carpeta `tests/` |
-| 4. Código | Bitácora de uso de IA (26 entradas) | [bitacora_ia.md](../bitacora_ia.md) |
+| 4. Código | Bitácora de uso de IA (28 entradas) | [bitacora_ia.md](../bitacora_ia.md) |
 | 4. Código | Revisión de código y seguridad | [revision_seguridad.md](../revision_seguridad.md) |
 | Final | Informe final | `informe_final.pdf` y `informe_final.md` |
 | Final | Diapositivas | `diapositivas.pdf` |

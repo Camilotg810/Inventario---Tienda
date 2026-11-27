@@ -128,6 +128,7 @@ requirements.txt                   # herramientas de desarrollo con versión fij
 .env.example                       # plantilla de variables de entorno (hoy vacía)
 revision_seguridad.md              # informe de revisión de código y seguridad
 bitacora_ia.md                     # bitácora de uso de IA
+docs/                              # documentos de cada módulo, informe final y diapositivas
 ```
 
 ## 7. Uso de IA
@@ -138,7 +139,7 @@ Se usó Claude como asistente en tres etapas:
 - **Semana 6:** hizo una segunda revisión del código y ayudó con las correcciones, los docstrings y el informe de seguridad. Cada hallazgo se verificó ejecutando el código.
 - **Etapa final:** escribió las pruebas y la implementación de HU-04 (pruebas primero), el pipeline y esta documentación, en la rama `final-farmastock`. Las pruebas se comprobaron con una prueba de mutación manual y los pasos del pipeline en una carpeta limpia.
 
-Cada decisión, con su verificación y su commit, está en [bitacora_ia.md](bitacora_ia.md) (entradas 1 a 12 de las semanas 5 y 6, y 13 a 17 de la etapa final).
+Cada decisión, con su verificación y su commit, está en [bitacora_ia.md](bitacora_ia.md) (28 entradas: 1 a 12 de la propuesta de reposición, 13 a 17 de HU-04, 18 a 22 de HU-02, 23 a 26 de la revisión de FarmaStock y 27 y 28 del informe final).
 
 ## 8. Autor y licencia
 
