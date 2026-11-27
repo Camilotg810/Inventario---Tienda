@@ -34,10 +34,16 @@ def _exigir_fecha_vigente(vence: date, hoy: date) -> None:
         raise ValueError(MENSAJE_LOTE_CADUCADO)
 
 
+def _clave_producto(nombre: str) -> str:
+    """Nombre sin diferencias de mayúsculas ni de espacios, para comparar productos."""
+    return " ".join(nombre.split()).casefold()
+
+
 def _ya_esta_registrado(lotes: list[Lote], producto: str, codigo_lote: str) -> bool:
     """Un código de lote es único dentro de cada producto."""
+    clave = _clave_producto(producto)
     return any(
-        lote.producto == producto and lote.codigo_lote == codigo_lote
+        _clave_producto(lote.producto) == clave and lote.codigo_lote == codigo_lote
         for lote in lotes
     )
 
@@ -73,4 +79,7 @@ def registrar_ingreso(
 
 def stock_total(lotes: list[Lote], producto: str) -> int:
     """Suma las unidades de todos los lotes del producto (0 si no tiene lotes)."""
-    return sum(lote.unidades for lote in lotes if lote.producto == producto)
+    clave = _clave_producto(producto)
+    return sum(
+        lote.unidades for lote in lotes if _clave_producto(lote.producto) == clave
+    )
